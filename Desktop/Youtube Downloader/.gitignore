@@ -1,0 +1,43 @@
+# Ignore system files
+AppData/
+Cookies/
+Documents/
+My Music/
+My Pictures/
+My Videos/
+Recent/
+Templates/
+# Ignore Chrome user data
+AppData/Local/Google/Chrome/User Data/*
+
+# Ignore system files and directories
+Application Data/
+Cookies/
+Local Settings/
+My Documents/
+NetHood/
+PrintHood/
+Recent/
+SendTo/
+Start Menu/
+Templates/
+
+# Ignore other personal files
+*.dat
+*.log
+*.ini
+
+# Ignore OneDrive, Downloads, and other personal data
+OneDrive/
+Downloads/
+Documents/
+Music/
+Pictures/
+Videos/
+clean/
+# Ignore Chrome-related files
+AppData/Local/Google/Chrome/User Data/
+*.log
+*.db
+*.blob
+
