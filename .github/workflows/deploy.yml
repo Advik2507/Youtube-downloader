@@ -1,0 +1,30 @@
+name: Deploy to Render
+
+on:
+  push:
+    branches:
+      - main  # or the branch you want to deploy from, like 'master'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'  # Adjust the version if needed
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Deploy to Render
+      run: |
+        curl -fsSL https://render.com/deploy.sh | bash
+      env:
+        RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}  # GitHub secret for Render API key
+        RENDER_SERVICE_ID: srv-d021qfbuibrs73b9m0u0  # Your actual Render service ID
