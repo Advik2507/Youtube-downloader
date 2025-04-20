@@ -12,46 +12,45 @@ if not os.path.exists('downloads'):
 def download_media(url, quality, media_type):
     if media_type == 'audio':
         ydl_opts = {
-            'format': 'bestaudio/best',  # Best audio quality
-            'outtmpl': 'downloads/%(title)s.%(ext)s',  # Output path and filename
+            'format': 'bestaudio/best',
+            'outtmpl': 'downloads/%(title)s.%(ext)s',
             'postprocessors': [{
                 'key': 'FFmpegAudio',
-                'preferredcodec': 'mp3',  # Convert audio to MP3
-                'preferredquality': '192',  # MP3 quality
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
             }],
         }
     else:
         if quality == 'best':
             ydl_opts = {
-                'format': 'bestvideo+bestaudio/best',  # Best video and audio quality
-                'outtmpl': 'downloads/%(title)s.%(ext)s',  # Output path and filename
+                'format': 'bestvideo+bestaudio/best',
+                'outtmpl': 'downloads/%(title)s.%(ext)s',
             }
         else:
             ydl_opts = {
-                'format': f'bestvideo[height={quality}]+bestaudio/best',  # Specific resolution
-                'outtmpl': 'downloads/%(title)s.%(ext)s',  # Output path and filename
+                'format': f'bestvideo[height={quality}]+bestaudio/best',
+                'outtmpl': 'downloads/%(title)s.%(ext)s',
             }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])  # Starts the download
+            ydl.download([url])
         return f"Download complete! {media_type.capitalize()} quality: {quality if media_type == 'video' else ''}"
     except Exception as e:
         return f"An error occurred: {str(e)}"
 
-# Main route for the app
+# Main route
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        url = request.form['url']  # Video URL from the form
-        quality = request.form['quality']  # Video quality from the dropdown
-        media_type = request.form['media_type']  # Video or audio type from the form
-        message = download_media(url, quality, media_type)  # Call the download function with quality and media type
+        url = request.form['url']
+        quality = request.form['quality']
+        media_type = request.form['media_type']
+        message = download_media(url, quality, media_type)
         return render_template_string(HTML_FORM, message=message)
-    
     return render_template_string(HTML_FORM, message=None)
 
-# HTML Form Template
+# HTML form
 HTML_FORM = '''
 <!DOCTYPE html>
 <html lang="en">
@@ -91,21 +90,7 @@ HTML_FORM = '''
 </html>
 '''
 
+# Run with environment PORT (for Render)
 if __name__ == '__main__':
-    app.run(debug=True)
-
-import os
-from flask import Flask
-
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "Welcome to the YouTube Downloader App!"
-
-if __name__ == "__main__":
-    port = int(os.getenv("PORT", 5000))  # Get the port from the environment or default to 5000
-    app.run(host="0.0.0.0", port=port)  # Bind to all available IPs
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
