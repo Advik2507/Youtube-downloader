@@ -9,18 +9,40 @@ if not os.path.exists('downloads'):
     os.makedirs('downloads')
 
 # Function to download the video or audio
-def download_media(url, quality, media_type):
+def download_media(url, quality, media_type, audio_quality):
     if media_type == 'audio':
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'outtmpl': 'downloads/%(title)s.%(ext)s',
-            'postprocessors': [{
-                'key': 'FFmpegAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
-        }
-    else:
+        if audio_quality == '320k':
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'outtmpl': 'downloads/%(title)s.%(ext)s',
+                'postprocessors': [{
+                    'key': 'FFmpegAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '320',
+                }],
+            }
+        elif audio_quality == '256k':
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'outtmpl': 'downloads/%(title)s.%(ext)s',
+                'postprocessors': [{
+                    'key': 'FFmpegAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '256',
+                }],
+            }
+        elif audio_quality == '192k':
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'outtmpl': 'downloads/%(title)s.%(ext)s',
+                'postprocessors': [{
+                    'key': 'FFmpegAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '192',
+                }],
+            }
+
+    else:  # Video download
         if quality == 'best':
             ydl_opts = {
                 'format': 'bestvideo+bestaudio/best',
@@ -35,7 +57,7 @@ def download_media(url, quality, media_type):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
-        return f"Download complete! {media_type.capitalize()} quality: {quality if media_type == 'video' else ''}"
+        return f"Download complete! {media_type.capitalize()} quality: {quality if media_type == 'video' else audio_quality}."
     except Exception as e:
         return f"An error occurred: {str(e)}"
 
@@ -46,7 +68,8 @@ def index():
         url = request.form['url']
         quality = request.form['quality']
         media_type = request.form['media_type']
-        message = download_media(url, quality, media_type)
+        audio_quality = request.form.get('audio_quality', '192k')
+        message = download_media(url, quality, media_type, audio_quality)
         return render_template_string(HTML_FORM, message=message)
     return render_template_string(HTML_FORM, message=None)
 
@@ -82,6 +105,13 @@ HTML_FORM = '''
             <option value="720p">720p</option>
             <option value="480p">480p</option>
             <option value="360p">360p</option>
+        </select><br><br>
+
+        <label for="audio_quality">Select Audio Quality (Only for Audio Downloads):</label>
+        <select name="audio_quality" id="audio_quality">
+            <option value="192k">192 kbps</option>
+            <option value="256k">256 kbps</option>
+            <option value="320k">320 kbps</option>
         </select><br><br>
 
         <input type="submit" value="Download">
