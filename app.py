@@ -1,9 +1,17 @@
 import os
 import re
+import base64
 import yt_dlp
 from flask import Flask, request, send_file, jsonify, render_template
 
 app = Flask(__name__)
+
+# Decode the cookies from environment variable ONCE during app start
+cookies_base64 = os.getenv('YT_COOKIES_BASE64')
+if cookies_base64:
+    cookies = base64.b64decode(cookies_base64).decode('utf-8')
+    with open('cookies.txt', 'w', encoding='utf-8') as f:
+        f.write(cookies)
 
 @app.route('/')
 def index():
@@ -22,13 +30,13 @@ def download_video():
         'outtmpl': os.path.join(download_dir, '%(title)s.%(ext)s'),
         'format': 'bestvideo+bestaudio/best',
         'merge_output_format': 'mp4',
+        'cookies': 'cookies.txt'  # Tell yt-dlp to use the decoded cookies
     }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(video_url, download=True)
             title = info_dict.get('title', 'video')
-            # Clean filename for invalid characters
             clean_title = re.sub(r'[\\/*?:"<>|]', "", title)
             video_file = os.path.join(download_dir, f"{clean_title}.mp4")
 
@@ -43,4 +51,3 @@ def download_video():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-
