@@ -26,6 +26,7 @@ def download_video():
     download_dir = os.path.join(os.getcwd(), 'downloads')
     os.makedirs(download_dir, exist_ok=True)
 
+    # Set download options
     ydl_opts = {
         'outtmpl': os.path.join(download_dir, '%(title)s.%(ext)s'),
         'format': 'bestvideo+bestaudio/best',
